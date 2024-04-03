@@ -5,6 +5,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import java.util.*;
+import java.lang.Math;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -33,7 +35,12 @@ import com.qualcomm.robotcore.util.ElapsedTime;
  * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
  * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
  */
-//Totally original code
+//Totally original code (part of it at least)
+/*Odometry info using accurate measurements:
+
+        43(.18)cm width (from wheel to wheel)
+        24.5cm length (from wheel to middle)
+ */
 
 @TeleOp
 public class Odometry_Testing extends LinearOpMode {
@@ -68,13 +75,48 @@ public class Odometry_Testing extends LinearOpMode {
         telemetry.addData("Status", "Program Running");
         telemetry.update();
 
+        //Initialization
+        double deltax1 =0 ;
+        double deltax2 = 0;
+        double deltay1 = 0 ;
+        double prevx1 =0, prevx2=0, prevy1=0;
+        double heading = 0 ; //this is in radians
+
+
+        double x_pos = 0 ;
+        double y_pos = 0;
+
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
             double max;
 
-            double deltax1 =0 ;
-            double deltax2 = 0;
-            double deltay1 = 0 ;
+            //calculation of raw encoder movement
+            deltax1 = leftEncoderCount.getPosition() - prevx1;
+            deltax2 = rightEncoderCount.getPosiiton() - prevx2;
+            deltay1 = centerEncoderCount.getPosition() - prevy1;
+
+            //additional rotation added this iteration in radians (this should work for angles < 0)
+            double rotation = ((deltax1 - deltax2) / 43.18);
+            //middle of robot (X-axis)
+            double middle_pos = (deltax1+ deltax2) / 2;
+            /*calculate the actual y axis movement perpendicular(actual movement - predicted curve)
+             The predicted curve part is the arc of the circle with a radius of
+             distance from Y-wheel to centre of robot(24.5)
+             circle with radius 24.5 ==> circumference: 49pi * rotation of robot/360 = disired arc length */
+            double delta_perp_pos = deltay1 - 24.5 * rotation;
+
+            double delta_x = middle_pos * Math.cos(heading) - delta_perp_pos * Math.sin(heading);
+            double delta_y = middle_pos * Math.sin(heading) + delta_perp_pos * Math.cos(heading);
+
+            x_pos += delta_x;
+            y_pos += delta_y;
+            heading += rotation;
+
+            prevx1 = leftEncoderCount.getPosition();
+            prevx2 = rightEncoderCount.getPosiiton();
+            prevy1 = centerEncoderCount.getPosition();
+
+
 
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
