@@ -47,23 +47,21 @@ public class Odometry_Testing extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor leftFrontDrive = null;
-    private DcMotor leftBackDrive = null;
-    private DcMotor rightFrontDrive = null;
-    private DcMotor rightBackDrive = null;
+    private DcMotor lf, lr, rf, rr;
 
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        leftFrontDrive  = hardwareMap.get(DcMotor.class, "left_front_drive");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "left_back_drive");
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "right_front_drive");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "right_back_drive");
+        lf  = hardwareMap.get(DcMotor.class, "lf");
+        lr  = hardwareMap.get(DcMotor.class, "lr");
+        rf= hardwareMap.get(DcMotor.class, "rf");
+        rr = hardwareMap.get(DcMotor.class, "rr");
 
-        leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-        leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
+        //Test after
+        //leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+        //leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Program Initialized");
@@ -91,9 +89,12 @@ public class Odometry_Testing extends LinearOpMode {
             double max;
 
             //calculation of raw encoder movement
-            deltax1 = leftEncoderCount.getPosition() - prevx1;
-            deltax2 = rightEncoderCount.getPosiiton() - prevx2;
-            deltay1 = centerEncoderCount.getPosition() - prevy1;
+            //lf --> x1 on the left
+            //rf --> x2 on the right
+            //lr --> y1
+            deltax1 = lf.getCurrentPosition() - prevx1;
+            deltax2 = rf.getCurrentPosition() - prevx2;
+            deltay1 = lr.getCurrentPosition() - prevy1;
 
             //additional rotation added this iteration in radians (this should work for angles < 0)
             double rotation = ((deltax1 - deltax2) / 43.18);
@@ -108,16 +109,31 @@ public class Odometry_Testing extends LinearOpMode {
             double delta_x = middle_pos * Math.cos(heading) - delta_perp_pos * Math.sin(heading);
             double delta_y = middle_pos * Math.sin(heading) + delta_perp_pos * Math.cos(heading);
 
+            //this is in terms of encoder count rn
             x_pos += delta_x;
             y_pos += delta_y;
             heading += rotation;
 
-            prevx1 = leftEncoderCount.getPosition();
-            prevx2 = rightEncoderCount.getPosiiton();
-            prevy1 = centerEncoderCount.getPosition();
+
+            double x, y;
+            //convert encoder count to cm  Diameter = 3.8cm
+            //display x and y
+
+            x = 3.8 * Math.PI * x_pos/8192 ;
+            y = 3.8 * Math.PI * y_pos/8192 ;
+
+            telemetry.addData("x position: ", x );
+            telemetry.addData("y position: " , y);
 
 
+            //for next iteration of the loop
+            prevx1 = lf.getCurrentPosition();
+            prevx2 = rf.getCurrentPosition();
+            prevy1 = lr.getCurrentPosition();
 
+            //------------------------odometry ends ------------------------------------------
+
+            /*
             // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
@@ -153,7 +169,9 @@ public class Odometry_Testing extends LinearOpMode {
             // Show the elapsed game time and wheel power.
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
-            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);
+            telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);*/
+
+
             telemetry.update();
         }
     }
