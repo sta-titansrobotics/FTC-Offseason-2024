@@ -4,9 +4,10 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.*;
-import java.lang.Math;
+import java.lang.Math.*;
 
 /*
  * This file contains an example of a Linear "OpMode".
@@ -54,8 +55,8 @@ public class Odometry_Testing extends LinearOpMode {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        lf  = hardwareMap.get(DcMotor.class, "lf");
-        lr  = hardwareMap.get(DcMotor.class, "lr");
+        lf  = hardwareMap.get(DcMotor.class, "lr"); //lf and lr are meant to be switched
+        lr  = hardwareMap.get(DcMotor.class, "lf");
         rf= hardwareMap.get(DcMotor.class, "rf");
         rr = hardwareMap.get(DcMotor.class, "rr");
 
@@ -66,6 +67,16 @@ public class Odometry_Testing extends LinearOpMode {
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Status", "Program Initialized");
         telemetry.update();
+
+
+        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        lr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        lf.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
         runtime.reset();
@@ -114,22 +125,25 @@ public class Odometry_Testing extends LinearOpMode {
             y_pos += delta_y;
             heading += rotation;
 
-
             double x, y;
-            //convert encoder count to cm  Diameter = 3.8cm
+            //convert encoder count to cm --> Wheel diameter = 3.8cm
             //display x and y
-
             x = 3.8 * Math.PI * x_pos/8192 ;
             y = 3.8 * Math.PI * y_pos/8192 ;
 
             telemetry.addData("x position: ", x );
             telemetry.addData("y position: " , y);
+            telemetry.addData("x1 motor position: ", lf.getCurrentPosition());
+            telemetry.addData("x2 motor position: " , rf.getCurrentPosition());
+            telemetry.addData("y1  motor position: " , lr.getCurrentPosition());
+            telemetry.addData("heading: ", heading);
 
 
             //for next iteration of the loop
             prevx1 = lf.getCurrentPosition();
             prevx2 = rf.getCurrentPosition();
             prevy1 = lr.getCurrentPosition();
+            telemetry.update();
 
             //------------------------odometry ends ------------------------------------------
 
@@ -172,7 +186,7 @@ public class Odometry_Testing extends LinearOpMode {
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);*/
 
 
-            telemetry.update();
+
         }
     }
 
