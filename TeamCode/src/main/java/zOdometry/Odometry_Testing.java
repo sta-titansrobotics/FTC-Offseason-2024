@@ -97,7 +97,7 @@ public class Odometry_Testing extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double max;
+            double max; //
 
             //calculation of raw encoder movement
             //lf --> x1 on the left
