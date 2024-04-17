@@ -9,33 +9,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.*;
 import java.lang.Math.*;
 
-/*
- * This file contains an example of a Linear "OpMode".
- * An OpMode is a 'program' that runs in either the autonomous or the teleop period of an FTC match.
- * The names of OpModes appear on the menu of the FTC Driver Station.
- * When a selection is made from the menu, the corresponding OpMode is executed.
- *
- * This particular OpMode illustrates driving a 4-motor Omni-Directional (or Holonomic) robot.
- * This code will work with either a Mecanum-Drive or an X-Drive train.
- * Both of these drives are illustrated at https://gm0.org/en/latest/docs/robot-design/drivetrains/holonomic.html
- * Note that a Mecanum drive must display an X roller-pattern when viewed from above.
- *
- * Also note that it is critical to set the correct rotation direction for each motor.  See details below.
- *
- * Holonomic drives provide the ability for the robot to move in three axes (directions) simultaneously.
- * Each motion axis is controlled by one Joystick axis.
- *
- * 1) Axial:    Driving forward and backward               Left-joystick Forward/Backward
- * 2) Lateral:  Strafing right and left                     Left-joystick Right and Left
- * 3) Yaw:      Rotating Clockwise and counter clockwise    Right-joystick Right and Left
- *
- * This code is written assuming that the right-side motors need to be reversed for the robot to drive forward.
- * When you first test your robot, if it moves backward when you push the left stick forward, then you must flip
- * the direction of all 4 motors (see code below).
- *
- * Use Android Studio to Copy this Class, and Paste it into your team's code folder with a new name.
- * Remove or comment out the @Disabled line to add this OpMode to the Driver Station OpMode list
- */
+
 //Totally original code (part of it at least)
 /*Odometry info using accurate measurements:
 
@@ -76,7 +50,6 @@ public class Odometry_Testing extends LinearOpMode {
         lr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        lf.setDirection(DcMotorSimple.Direction.REVERSE);
 
         waitForStart();
         runtime.reset();
@@ -103,12 +76,13 @@ public class Odometry_Testing extends LinearOpMode {
             //lf --> x1 on the left
             //rf --> x2 on the right
             //lr --> y1
+
             deltax1 = lf.getCurrentPosition() - prevx1;
             deltax2 = rf.getCurrentPosition() - prevx2;
             deltay1 = lr.getCurrentPosition() - prevy1;
 
             //additional rotation added this iteration in radians (this should work for angles < 0)
-            double rotation = ((deltax1 - deltax2) / 43.18);
+            double rotation = Math.atan(((deltax1 - deltax2) / 43.18));
             //middle of robot (X-axis)
             double middle_pos = (deltax1+ deltax2) / 2;
             /*calculate the actual y axis movement perpendicular(actual movement - predicted curve)
@@ -134,8 +108,13 @@ public class Odometry_Testing extends LinearOpMode {
             telemetry.addData("x position: ", x );
             telemetry.addData("y position: " , y);
             telemetry.addData("x1 motor position: ", lf.getCurrentPosition());
+            telemetry.addData("respective adjustment: ", deltax1);
             telemetry.addData("x2 motor position: " , rf.getCurrentPosition());
+            telemetry.addData("respective  adjustment: ", deltax2);
+
             telemetry.addData("y1  motor position: " , lr.getCurrentPosition());
+            telemetry.addData("respective adjustment: ", deltay1);
+
             telemetry.addData("heading: ", heading);
 
 
