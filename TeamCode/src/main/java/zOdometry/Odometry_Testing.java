@@ -30,8 +30,8 @@ public class Odometry_Testing extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
         odom_l  = hardwareMap.get(DcMotor.class, "odom_l"); //odom_l and odom_h are meant to be switched
-        odom_h  = hardwareMap.get(DcMotor.class, "odom_r");
-        odom_r= hardwareMap.get(DcMotor.class, "odom_h");
+        odom_r  = hardwareMap.get(DcMotor.class, "odom_r");
+        odom_h = hardwareMap.get(DcMotor.class, "odom_h");
 
 
         //Test after
@@ -44,11 +44,11 @@ public class Odometry_Testing extends LinearOpMode {
 
 
         odom_l.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odom_l.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //odom_l.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         odom_r.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odom_r.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //odom_r.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         odom_h.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        odom_h.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        //odom_h.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         waitForStart();
@@ -58,9 +58,9 @@ public class Odometry_Testing extends LinearOpMode {
         telemetry.update();
 
         //Initialization
-        double deltax1 =0 ;
+        double deltax1 = 0;
         double deltax2 = 0;
-        double deltay1 = 0 ;
+        double deltay1 = 0;
         double prevx1 =0, prevx2=0, prevy1=0;
         double heading = 0 ; //this is in radians
 
@@ -84,15 +84,15 @@ public class Odometry_Testing extends LinearOpMode {
             //additional rotation added this iteration in radians (this should work for angles < 0)
             double rotation = Math.atan(((deltax1 - deltax2) / 43.18));
             //middle of robot (X-axis)
-            double middle_pos = (deltax1+ deltax2) / 2;
+            double middle_pos = (deltax1 + deltax2) / 2;
             /*calculate the actual y axis movement perpendicular(actual movement - predicted curve)
              The predicted curve part is the arc of the circle with a radius of
              distance from Y-wheel to centre of robot(24.5)
              circle with radius 24.5 ==> circumference: 49pi * rotation of robot/360 = disired arc length */
             double delta_perp_pos = deltay1 - 24.5 * rotation;
 
-            double delta_x = middle_pos * Math.cos(heading) - delta_perp_pos * Math.sin(heading);
-            double delta_y = middle_pos * Math.sin(heading) + delta_perp_pos * Math.cos(heading);
+            double delta_x = middle_pos * Math.cos(rotation) - delta_perp_pos * Math.sin(rotation);
+            double delta_y = middle_pos * Math.sin(rotation) + delta_perp_pos * Math.cos(rotation);
 
             //this is in terms of encoder count rn
             x_pos += delta_x;
@@ -102,8 +102,8 @@ public class Odometry_Testing extends LinearOpMode {
             double x, y;
             //convert encoder count to cm --> Wheel diameter = 3.8cm
             //display x and y
-            x = 3.8 * Math.PI * x_pos/8192 ;
-            y = 3.8 * Math.PI * y_pos/8192 ;
+            x = 3.8 * Math.PI * x_pos/8192;
+            y = 3.8 * Math.PI * y_pos/8192;
 
             telemetry.addData("x position: ", x );
             telemetry.addData("y position: " , y);
@@ -164,6 +164,7 @@ public class Odometry_Testing extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);*/
+            sleep(10);
         }
     }
 
