@@ -118,7 +118,7 @@ public class TensorFlowObjectDetection extends LinearOpMode {
 
         List<Recognition> currentRecognitions = tfod.getRecognitions();
         telemetry.addData("# Objects Detected", currentRecognitions.size());
-        telemetry.addData("Selected Model", "ftc website ("+selectedmodel+").tflite");
+        telemetry.addData("Selected Model", "gonnashitmypants2.tflite");
 
         // Step through the list of recognitions and display info for each one.
         for (Recognition recognition : currentRecognitions) {
@@ -141,7 +141,7 @@ public class TensorFlowObjectDetection extends LinearOpMode {
         tfod = TfodProcessor.easyCreateWithDefaults();
 
         tfod = new TfodProcessor.Builder()
-                .setModelAssetName("ftc website ("+selectedmodel+").tflite")
+                .setModelAssetName("gonnashitmypants2.tflite")
                 .setModelLabels(LABELS)
                 .build();
 

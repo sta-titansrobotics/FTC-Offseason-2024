@@ -127,7 +127,7 @@ public class movementtest extends LinearOpMode {
 
             //imu increases when turning left and decreases when turning right
 
-            dir = Math.atan2(gamepad1.right_stick_y, gamepad1.right_stick_x)-offset;
+            dir = Math.atan2(-gamepad1.right_stick_y, gamepad1.right_stick_x)-offset;
             mag = Math.sqrt(Math.pow(gamepad1.right_stick_x, 2) + Math.pow(gamepad1.right_stick_y, 2));
             mag *= Math.sqrt(2);
             if (mag > Math.sqrt(2))
