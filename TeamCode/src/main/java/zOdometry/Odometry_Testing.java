@@ -22,17 +22,17 @@ public class Odometry_Testing extends LinearOpMode {
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor lf, lr, rf, rr;
+    private DcMotor odom_l, odom_h, odom_r, rr;
 
     @Override
     public void runOpMode() {
 
         // Initialize the hardware variables. Note that the strings used here must correspond
         // to the names assigned during the robot configuration step on the DS or RC devices.
-        lf  = hardwareMap.get(DcMotor.class, "lr"); //lf and lr are meant to be switched
-        lr  = hardwareMap.get(DcMotor.class, "lf");
-        rf= hardwareMap.get(DcMotor.class, "rf");
-        rr = hardwareMap.get(DcMotor.class, "rr");
+        odom_l  = hardwareMap.get(DcMotor.class, "odom_l"); //odom_l and odom_h are meant to be switched
+        odom_r  = hardwareMap.get(DcMotor.class, "odom_r");
+        odom_h = hardwareMap.get(DcMotor.class, "odom_h");
+
 
         //Test after
         //leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
@@ -43,12 +43,12 @@ public class Odometry_Testing extends LinearOpMode {
         telemetry.update();
 
 
-        lf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        rf.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rf.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        lr.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        lr.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        odom_l.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //odom_l.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        odom_r.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //odom_r.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        odom_h.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        //odom_h.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
 
         waitForStart();
@@ -58,9 +58,9 @@ public class Odometry_Testing extends LinearOpMode {
         telemetry.update();
 
         //Initialization
-        double deltax1 =0 ;
+        double deltax1 = 0;
         double deltax2 = 0;
-        double deltay1 = 0 ;
+        double deltay1 = 0;
         double prevx1 =0, prevx2=0, prevy1=0;
         double heading = 0 ; //this is in radians
 
@@ -70,29 +70,29 @@ public class Odometry_Testing extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            double max; //
 
             //calculation of raw encoder movement
-            //lf --> x1 on the left
-            //rf --> x2 on the right
-            //lr --> y1
+            //odom_l --> x1 on the left
+            //odom_r --> x2 on the right
+            //odom_h --> y1
+            //
 
-            deltax1 = lf.getCurrentPosition() - prevx1;
-            deltax2 = rf.getCurrentPosition() - prevx2;
-            deltay1 = lr.getCurrentPosition() - prevy1;
+            deltax1 = odom_l.getCurrentPosition() - prevx1;
+            deltax2 = odom_r.getCurrentPosition() - prevx2;
+            deltay1 = odom_h.getCurrentPosition() - prevy1;
 
             //additional rotation added this iteration in radians (this should work for angles < 0)
             double rotation = Math.atan(((deltax1 - deltax2) / 43.18));
             //middle of robot (X-axis)
-            double middle_pos = (deltax1+ deltax2) / 2;
+            double middle_pos = (deltax1 + deltax2) / 2;
             /*calculate the actual y axis movement perpendicular(actual movement - predicted curve)
              The predicted curve part is the arc of the circle with a radius of
              distance from Y-wheel to centre of robot(24.5)
              circle with radius 24.5 ==> circumference: 49pi * rotation of robot/360 = disired arc length */
             double delta_perp_pos = deltay1 - 24.5 * rotation;
 
-            double delta_x = middle_pos * Math.cos(heading) - delta_perp_pos * Math.sin(heading);
-            double delta_y = middle_pos * Math.sin(heading) + delta_perp_pos * Math.cos(heading);
+            double delta_x = middle_pos * Math.cos(rotation) - delta_perp_pos * Math.sin(rotation);
+            double delta_y = middle_pos * Math.sin(rotation) + delta_perp_pos * Math.cos(rotation);
 
             //this is in terms of encoder count rn
             x_pos += delta_x;
@@ -102,26 +102,27 @@ public class Odometry_Testing extends LinearOpMode {
             double x, y;
             //convert encoder count to cm --> Wheel diameter = 3.8cm
             //display x and y
-            x = 3.8 * Math.PI * x_pos/8192 ;
-            y = 3.8 * Math.PI * y_pos/8192 ;
+            x = 3.8 * Math.PI * x_pos/8192;
+            y = 3.8 * Math.PI * y_pos/8192;
 
             telemetry.addData("x position: ", x );
             telemetry.addData("y position: " , y);
-            telemetry.addData("x1 motor position: ", lf.getCurrentPosition());
+            telemetry.addData("x1 motor position: ", odom_l.getCurrentPosition());
             telemetry.addData("respective adjustment: ", deltax1);
-            telemetry.addData("x2 motor position: " , rf.getCurrentPosition());
+            telemetry.addData("x2 motor position: " , odom_r.getCurrentPosition());
             telemetry.addData("respective  adjustment: ", deltax2);
 
-            telemetry.addData("y1  motor position: " , lr.getCurrentPosition());
+            telemetry.addData("y1  motor position: " , odom_h.getCurrentPosition());
             telemetry.addData("respective adjustment: ", deltay1);
 
+            telemetry.addData("rotation: " , rotation);
             telemetry.addData("heading: ", heading);
 
 
             //for next iteration of the loop
-            prevx1 = lf.getCurrentPosition();
-            prevx2 = rf.getCurrentPosition();
-            prevy1 = lr.getCurrentPosition();
+            prevx1 = odom_l.getCurrentPosition();
+            prevx2 = odom_r.getCurrentPosition();
+            prevy1 = odom_h.getCurrentPosition();
             telemetry.update();
 
             //------------------------odometry ends ------------------------------------------
@@ -163,9 +164,7 @@ public class Odometry_Testing extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);*/
-
-
-
+            sleep(10);
         }
     }
 
