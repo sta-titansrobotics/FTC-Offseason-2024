@@ -49,7 +49,11 @@ public class Odometry_Testing extends LinearOpMode {
         //odom_r.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         odom_h.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         //odom_h.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        odom_l.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        odom_r.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        odom_h.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        odom_h.setDirection(DcMotor.Direction.REVERSE);
 
         waitForStart();
         runtime.reset();
@@ -65,8 +69,8 @@ public class Odometry_Testing extends LinearOpMode {
         double heading = 0 ; //this is in radians
 
 
-        double x_pos = 0 ;
-        double y_pos = 0;
+        double x_global_pos = 0 ;
+        double y_global_pos = 0;
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -84,39 +88,44 @@ public class Odometry_Testing extends LinearOpMode {
             //additional rotation added this iteration in radians (this should work for angles < 0)
             double rotation = Math.atan(((deltax1 - deltax2) / 43.18));
             //middle of robot (X-axis)
-            double middle_pos = (deltax1 + deltax2) / 2;
+            double delta_local_x = (deltax1 + deltax2) / 2;
+
             /*calculate the actual y axis movement perpendicular(actual movement - predicted curve)
              The predicted curve part is the arc of the circle with a radius of
              distance from Y-wheel to centre of robot(24.5)
              circle with radius 24.5 ==> circumference: 49pi * rotation of robot/360 = disired arc length */
-            double delta_perp_pos = deltay1 - 24.5 * rotation;
+            double delta_perp_pos = deltay1 - 24.5 * rotation/(2*Math.PI);
+            //rotation = 0;
+            double delta_x = delta_local_x * Math.cos(rotation) - delta_perp_pos * Math.sin(rotation);
+            double delta_y = delta_local_x * Math.sin(rotation) + delta_perp_pos * Math.cos(rotation);
 
-            double delta_x = middle_pos * Math.cos(rotation) - delta_perp_pos * Math.sin(rotation);
-            double delta_y = middle_pos * Math.sin(rotation) + delta_perp_pos * Math.cos(rotation);
-
-            //this is in terms of encoder count rn
-            x_pos += delta_x;
-            y_pos += delta_y;
+            //this is in terms of encoder count rn, so encoder count to each x, y position
+            x_global_pos += delta_local_x;
+            y_global_pos += delta_y;
             heading += rotation;
 
             double x, y;
             //convert encoder count to cm --> Wheel diameter = 3.8cm
             //display x and y
-            x = 3.8 * Math.PI * x_pos/8192;
-            y = 3.8 * Math.PI * y_pos/8192;
+            x = 3.8 * Math.PI * (x_global_pos/8192);
+            y = 3.8 * Math.PI * (y_global_pos/8192);
 
-            telemetry.addData("x position: ", x );
-            telemetry.addData("y position: " , y);
+//            telemetry.addData("x position: ", x );
+////            telemetry.addData("x position ticks: ", x_pos );
+            telemetry.addData("x_pos", x_global_pos);
+
+//            telemetry.addData("y position: " , y);
+
             telemetry.addData("x1 motor position: ", odom_l.getCurrentPosition());
-            telemetry.addData("respective adjustment: ", deltax1);
+           telemetry.addData("respective adjustment: ", deltax1);
             telemetry.addData("x2 motor position: " , odom_r.getCurrentPosition());
             telemetry.addData("respective  adjustment: ", deltax2);
-
-            telemetry.addData("y1  motor position: " , odom_h.getCurrentPosition());
-            telemetry.addData("respective adjustment: ", deltay1);
-
-            telemetry.addData("rotation: " , rotation);
-            telemetry.addData("heading: ", heading);
+//
+//            telemetry.addData("y1  motor position: " , odom_h.getCurrentPosition());
+//            telemetry.addData("respective adjustment: ", deltay1);
+//
+//            telemetry.addData("rotation: " , rotation);
+//            telemetry.addData("heading: ", heading);
 
 
             //for next iteration of the loop
@@ -164,7 +173,7 @@ public class Odometry_Testing extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Front left/Right", "%4.2f, %4.2f", leftFrontPower, rightFrontPower);
             telemetry.addData("Back  left/Right", "%4.2f, %4.2f", leftBackPower, rightBackPower);*/
-            sleep(10);
+
         }
     }
 
