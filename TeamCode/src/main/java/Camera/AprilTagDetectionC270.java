@@ -31,7 +31,7 @@ public class AprilTagDetectionC270 extends LinearOpMode {
     double cy = 240.0;
 
     // Tag size in meters
-    double tagsize = 0.166;
+    double tagsize = 0.05;
 
     @Override
     public void runOpMode() {
