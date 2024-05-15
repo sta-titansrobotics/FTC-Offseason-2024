@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode;
+/*/*package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -208,7 +208,7 @@ public class DriveControlled446 extends LinearOpMode {
                 sliderMotor.setPower(sliderPower);
             }/*else if(sliderPower < 0 && sliderPos < sliderMax){
                 sliderMotor.setPower(sliderPower);
-            }*/else{
+            }else{
                 sliderMotor.setPower(0);
             }
 
@@ -231,6 +231,8 @@ public class DriveControlled446 extends LinearOpMode {
             telemetry.addData("Intake Motor Power: ", intakeMotor.getPower());
 
             //Slider telemetry
+
+
             telemetry.addData("Slider Power: ", sliderMotor.getPower());
             telemetry.addData("Slider Position: ", sliderMotor.getCurrentPosition());
 
@@ -322,3 +324,4 @@ public class DriveControlled446 extends LinearOpMode {
     }    
 }
 
+*/
