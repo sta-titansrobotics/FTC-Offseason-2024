@@ -44,6 +44,8 @@ public class movementtest extends LinearOpMode {
 
     boolean directionChange= false;
 
+    int sliderLim = 0;
+
     double prevtime;
 
     static double dir;
@@ -120,6 +122,130 @@ public class movementtest extends LinearOpMode {
 
         // --------------------------------Mode------------------------------------------------------
         while (opModeIsActive()) {
+
+            // Intake
+            if (gamepad2.right_bumper)
+                Intake.setPower(0.8);
+            else
+                Intake.setPower(0);
+
+            if (gamepad2.right_trigger > 0) {
+                Intake.setPower(-gamepad2.right_trigger / 1.5);
+            }
+            //manual adjustment
+            if (gamepad2.dpad_down)
+                sliderLim = sliderLim - 20;
+            else if (gamepad2.dpad_up){
+                sliderLim = sliderLim + 20;
+            }
+            if (gamepad2.right_trigger > 0) {
+                Intake.setPower(-gamepad2.right_trigger / 1.5);
+            }
+
+            // hang: mapped to right joystick power
+            // Climbing1.setPower(gamepad2.right_stick_y);
+            // Climbing2.setPower(gamepad2.right_stick_y); //ticks to 10,000
+
+            // better hanging
+            if (gamepad2.a && !but2Acheck) {
+                button2A += 1;
+                but2Acheck = true;
+            }
+            if (!gamepad2.a) {
+                but2Acheck = false;
+            }
+
+            if (!but2Acheck) {
+                if (button2A % 2 == 1) {
+                    if (Climbing1.getCurrentPosition() < 10000) {
+                        Climbing1.setPower(1);
+                        Climbing2.setPower(1);
+                    } else {
+                        Climbing1.setPower(0);
+                        Climbing2.setPower(0);
+                    }
+                } else {
+                    if (Climbing1.getCurrentPosition() > 40) {
+                        Climbing1.setPower(-1);
+                        Climbing2.setPower(-1);
+                    } else {
+                        Climbing1.setPower(0);
+                        Climbing2.setPower(0);
+                    }
+                }
+            }
+
+            // Paper Launcher
+            if (gamepad2.x) {
+                Launcher.setPosition(-1);
+            }
+
+            if (gamepad2.x && !but2Xcheck) {
+                button2X += 1;
+                but2Xcheck = true;
+            }
+            if (!gamepad2.x) {
+                but2Xcheck = false;
+            }
+
+            if (!but2Xcheck) {
+                if (button2X % 2 == 1) {
+                    Launcher.setPosition(1);
+                } else {
+                    Launcher.setPosition(0);
+                }
+            }
+
+            // normal slider code
+            if (gamepad1.right_bumper && Sliders.getCurrentPosition() < (8500 + sliderLim)) {
+                Sliders.setPower(1);
+            } else if (gamepad1.right_trigger > 0.1 && Sliders.getCurrentPosition() > (100 + sliderLim)) {
+                Sliders.setPower(-gamepad1.right_trigger);
+            } else {
+                Sliders.setPower(0);
+            }
+
+            if (Sliders.getCurrentPosition() <= 100)
+                Sliders.setPower(0);
+
+            // wrist
+            if (gamepad2.left_bumper) {
+                Wrist.setPosition(Range.clip(Wrist.getPosition() - 0.0015, 0, 1));
+            }
+            if (gamepad2.left_trigger > 0.5) {
+                Wrist.setPosition(Range.clip(Wrist.getPosition() + 0.0015, 0, 1));
+            }
+
+            // Macro for slider and wrist
+            if (gamepad2.y && !but2Ycheck) {
+                but2Ycheck = true;
+            }
+
+            if (but2Ycheck) {
+                Wrist.setPosition(0.771);
+
+                if (Sliders.getCurrentPosition() > 100) {
+                    Sliders.setPower(-1);
+                } else {
+                    but2Ycheck = false;
+                }
+            }
+
+            if (gamepad2.b){
+                directionChange = true;
+                if (button2B % 2 == 1) {
+                    Pinball1.setPower(1);
+                    Pinball2.setPower(-1); //opposite since the servos itself is mounted in opposite directions
+                } else {
+                    Pinball1.setPower(-1);
+                    Pinball2.setPower(1);
+                }
+            }
+            if (!gamepad2.b&&directionChange) {
+                button2B += 1;
+                directionChange = false;
+            }
+
             // ------------------DRIVE TRAIN---------------------------------
             // Driving
 
