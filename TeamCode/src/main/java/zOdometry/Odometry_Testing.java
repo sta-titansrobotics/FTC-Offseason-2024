@@ -20,8 +20,8 @@ public class Odometry_Testing extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor odom_l, odom_r, odom_h;
     private BNO055IMU imu;
-    Orientation             lastAngles = new Orientation();
-    double                  globalAngle;
+    Orientation lastAngles = new Orientation();
+    double globalAngle;
     @Override
     public void runOpMode() {
         // Initialize the hardware variables.
@@ -59,6 +59,9 @@ public class Odometry_Testing extends LinearOpMode {
             double encoder_l = encoderToMetres(odom_l.getCurrentPosition());
             double encoder_r = encoderToMetres(odom_r.getCurrentPosition());
             double encoder_h = encoderToMetres(-odom_h.getCurrentPosition());
+            telemetry.addData("l", encoder_l);
+            telemetry.addData("r", encoder_r);
+            telemetry.addData("h", encoder_h);
 
             // Get current angle from IMU
             current_ang = Math.toRadians(getAngle());
@@ -74,6 +77,7 @@ public class Odometry_Testing extends LinearOpMode {
             delta_local_y = delta_encoder_h - (delta_ang * disM_encoderHtoCenter);
 
             // Convert local changes to global coordinates
+            current_ang = 0;
             delta_global_x = delta_local_x * Math.cos(current_ang) - delta_local_y * Math.sin(current_ang);
             delta_global_y = delta_local_x * Math.sin(current_ang) + delta_local_y * Math.cos(current_ang);
 
