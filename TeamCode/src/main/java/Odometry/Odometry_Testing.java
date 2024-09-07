@@ -1,4 +1,4 @@
-package zOdometry;
+package Odometry;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -10,8 +10,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
-import org.firstinspires.ftc.robotcore.external.navigation.Position;
-import org.firstinspires.ftc.robotcore.external.navigation.Velocity;
 
 @TeleOp
 public class Odometry_Testing extends LinearOpMode {
@@ -45,14 +43,13 @@ public class Odometry_Testing extends LinearOpMode {
         odom_r.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         odom_h.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
-        waitForStart();
-        runtime.reset();
-
         double prev_encoder_l = 0, prev_encoder_r = 0, prev_encoder_h = 0, prev_ang = 0, current_ang ;
         double delta_encoder_l, delta_encoder_r, delta_encoder_h, delta_local_x, delta_local_y, delta_global_x, delta_global_y, delta_ang;
         double global_xM = 0, global_yM = 0;
         double disM_encoderHtoCenter = 0.235; // Distance from the horizontal encoder to the center of the robot in meters
+
+        waitForStart();
+        runtime.reset();
 
         while (opModeIsActive() && !isStopRequested()) {
             // Convert encoder ticks to meters
@@ -96,14 +93,13 @@ public class Odometry_Testing extends LinearOpMode {
             prev_encoder_r = encoder_r;
             prev_encoder_h = encoder_h;
             prev_ang = current_ang;
-            sleep(10);
         }
     }
 
     // Method to convert encoder ticks to meters
     private double encoderToMetres(int ticks) {
         double wheelDiameter = 0.038; // Diameter of the wheel in meters (3.8 cm)
-        double ticksPerRevolution = 8192; // Number of encoder ticks per wheel revolution
+        double ticksPerRevolution = 8192.0; // Number of encoder ticks per wheel revolution
         double circumference = wheelDiameter * Math.PI; // Circumference of the wheel in meters
         return (ticks / ticksPerRevolution) * circumference; // Convert ticks to meters
     }
