@@ -75,8 +75,12 @@ public class Odometry_Testing extends LinearOpMode {
 
             // Convert local changes to global coordinates
            // current_ang = 0;
+            // delta_global_x = delta_local_x * Math.cos(current_ang) - delta_local_y * Math.sin(current_ang);
+            // delta_global_y = delta_local_x * Math.sin(current_ang) + delta_local_y * Math.cos(current_ang);
+
+            //Slight change to above code that corrects y-positioning 
             delta_global_x = delta_local_x * Math.cos(current_ang) - delta_local_y * Math.sin(current_ang);
-            delta_global_y = delta_local_x * Math.sin(current_ang) + delta_local_y * Math.cos(current_ang);
+            delta_global_y = delta_encoder_h * Math.sin(current_ang) + delta_local_y * Math.cos(current_ang);
 
             // Update global positions
             global_xM += delta_global_x;
